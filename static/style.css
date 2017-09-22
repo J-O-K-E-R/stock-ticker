@@ -1,0 +1,30 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    list-style-type: none;
+    width: 60%;
+    margin: 0px auto;
+    padding: 0px;
+}
+
+.stock-element {
+    display: inline-block;
+    width: 16%;
+    text-align: center;
+}
+
+.container {
+    margin: 20px 200px;
+    padding: 0px;
+}
+
+.roll-container {
+    display: inline-block;
+}
+
+.roll-container div {
+    display: inline-block;
+}

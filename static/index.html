@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Ticker</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <ul class="stock-container">
+            <li class="stock-element" id="grain">
+                <div class="stock-value" id="grain-value"></div>
+                <div class="stock-name">grain</div>
+            </li>
+            <li class="stock-element" id="industrial">
+                <div class="stock-value" id="industrial-value"></div>
+                <div class="stock-name">industrial</div>
+            </li>
+            <li class="stock-element" id="bonds">
+                <div class="stock-value" id="bonds-value"></div>
+                <div class="stock-name">bonds</div>
+            </li>
+            <li class="stock-element" id="oil">
+                <div class="stock-value" id="oil-value"></div>
+                <div class="stock-name">oil</div>
+            </li>
+            <li class="stock-element" id="silver">
+                <div class="stock-value" id="silver-value"></div>
+                <div class="stock-name">silver</div>
+            </li>
+            <li class="stock-element" id="gold">
+                <div class="stock-value" id="gold-value"></div>
+                <div class="stock-name">gold</div>
+            </li>
+        </ul>
+        <button type="button" id="roll">Roll</button>
+        <div id="roll-container">
+            <div id="roll-stock"></div>
+            <div id="roll-dir"></div>
+            <div id="roll-num"></div>
+        </div>
+    </div>
+</body>
+<script src="/static/game.js"></script>
+</html>
