@@ -5,8 +5,8 @@ body {
 
 ul {
     list-style-type: none;
-    width: 60%;
-    margin: 0px auto;
+    width: 100%;
+    margin: 0px;
     padding: 0px;
 }
 
@@ -17,14 +17,23 @@ ul {
 }
 
 .container {
-    margin: 20px 200px;
+    margin: 20px 300px;
     padding: 0px;
 }
 
 .roll-container {
-    display: inline-block;
+    margin: 25px auto;
+    width: 100%;
+    text-align: center;
 }
 
 .roll-container div {
     display: inline-block;
+}
+
+.roll-display {
+    margin: 0px;
+    padding: 5px;
+    width: 100%;
+    text-align: center;
 }

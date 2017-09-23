@@ -11,10 +11,6 @@ var stocks = {
     "gold-value": 100
 };
 
-function parseResult(result) {
-
-}
-
 $(document).ready(function() {
     $("#roll").on("click", function() {
         socket.emit("roll", "player rolled");
@@ -29,5 +25,8 @@ $(document).ready(function() {
             $("#" + key).text(stocks.key);
             i++;
         });
+        $("#roll-stock").text(result.stock);
+        $("#roll-dir").text(result.direction);
+        $("#roll-num").text(result.delta);
     });
 });

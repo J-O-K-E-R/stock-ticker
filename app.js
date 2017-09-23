@@ -20,6 +20,14 @@ server.listen(3000, function() {
 });
 
 // server game logic
+var stocksname = [
+    "Grain",
+    "Industrial",
+    "Bonds",
+    "Oil",
+    "Silver",
+    "Gold"
+];
 var stocksvalue = [100,100,100,100,100,100];
 
 var rollStock;
@@ -28,13 +36,23 @@ var rollNum;
 var delta;
 var result = {};
 
+function rollDie() {
+    return Math.floor(Math.random()*6) + 1;
+}
+
 io.on("connection", function(socket) {
     socket.on("roll", function(data) {
+        result = {
+            "stock": "",
+            "direction": "",
+            "delta": 0,
+            "stocksvalue": []
+        }
         console.log(data);
-        rollStock = Math.floor((Math.random()*6) + 1);
+        rollStock = rollDie();
         console.log(rollStock);
-        rollDir = (Math.random() >= 0.5);
-        rollNum = Math.floor((Math.random()*3) + 1);
+        rollDir = Math.ceil(rollDie() / 2);
+        rollNum = Math.ceil(rollDie() / 2);
         if (rollNum == 1) {
             delta = 5;
         } else if (rollNum == 2) {
@@ -42,19 +60,28 @@ io.on("connection", function(socket) {
         } else {
             delta = 20;
         }
-        if (rollDir) {
+        if (rollDir == 1) {
             stocksvalue[rollStock] += delta;
-        } else {
+            if ( stocksvalue[rollStock] >= 200 ) {
+                stocksvalue[rollStock] = 100;
+            }
+            result.direction = "UP";
+        } else if (rollDir == 2) {
             stocksvalue[rollStock] -= delta;
+            if ( stocksvalue[rollStock] <= 0 ) {
+                stocksvalue[rollStock] = 100;
+            }
+            result.direction = "DOWN";
+        } else {
+            // DIVIDENDS!!$$!s
+            result.direction = "DIV";
+            console.log("$$$$$$$$$$$$$$$$$$$$$$$$");
         }
-        result = {
-            "rollStock": rollStock,
-            "rollDir": rollDir,
-            "delta": delta,
-            "stocksvalue": stocksvalue
-        }
+        result.stock = stocksname[rollStock];
+        result.delta = delta;
+        result.stocksvalue = stocksvalue;
         socket.emit("update", result);
-    })
+    });
 });
 
 // testing connection
