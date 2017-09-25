@@ -7,6 +7,8 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
+var player = require("./player.js");
+
 app.set("port", 3000);
 app.use("/static", express.static(__dirname + "/static"));
 
@@ -36,25 +38,40 @@ var rollNum;
 var delta;
 var result = {};
 
-
+var players = [];
+console.log(players.length);
 
 io.on("connection", function(socket) {
+    players.push(new player.Player(socket.id,"Player ",2000,[0,0,0,0,0,0]));
+    console.log("a player connected");
+    console.log(players.length);
+    // sends new player info to all clients
+    io.sockets.emit("new player", players);
+
+    socket.on("disconnect", function() {
+        playerDisconnect(socket.id);
+        console.log("a player disconnected");
+        console.log(players.length);
+    });
+
     // sends the value of the stocks to the client when it connects/refreshes
     socket.emit("load", stocksvalue);
 
     // rolls the dice, updates values, sends result back to client
     socket.on("roll", function(data) {
-        rollDice(socket);
+        rollDice();
+        io.sockets.emit("update", result);
     });
-
-    // rolls the dice every 3 seconds
-    setInterval(function() {
-        rollDice(socket);
-    }, 3000);
 });
 
+// rolls the dice every 3 seconds
+setInterval(function() {
+    rollDice();
+    io.sockets.emit("update", result);
+}, 3000);
+
 // rolls dice, updates values and sends the result to the client
-function rollDice(socket) {
+function rollDice() {
     result = {
         "stock": "",
         "direction": "",
@@ -90,9 +107,16 @@ function rollDice(socket) {
     result.stock = stocksname[rollStock];
     result.delta = delta;
     result.stockvalue = stocksvalue[rollStock];
-    socket.emit("update", result);
 };
 
 function rollDie() {
     return Math.floor(Math.random()*6) + 1;
+}
+
+// handles player disconnects
+function playerDisconnect(id) {
+    var index = players.findIndex(function(i) {
+        return i.id === id;
+    });
+    players.splice(index,1);
 }

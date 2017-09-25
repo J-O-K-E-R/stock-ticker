@@ -18,7 +18,7 @@ $(document).ready(function() {
     socket.on("load", function(stocksvalue) {
         $.each(stocks, function(i) {
             $("#" + stocks[i]).text(stocksvalue[i]);
-        });
+        });        
     });
 
     // updates the game with the result of the roll
@@ -27,5 +27,12 @@ $(document).ready(function() {
         $("#roll-stock").text(result.stock);
         $("#roll-dir").text(result.direction);
         $("#roll-num").text(result.delta);
+    });
+
+    socket.on("new player", function(players) {
+        $.each(players, function(i) {
+            $("#player-list").empty();
+            $("#player-list").append("<li>" + i.name + "</li>");
+        });
     });
 });
