@@ -30,7 +30,7 @@ $(document).ready(function() {
             $("#" + players[i].id).append('<div class="player-money">$' + players[i].money + "</div>");
             $("#" + players[i].id).append('<ul class="player-stocks"></ul>')
             $.each(players[i].stocks, function(j) {
-                $("#" + players[i].id + "> ul").append('<div class="player-stock-display">' + players[i].stocks[j] + "</div>");
+                $("#" + players[i].id + "> ul").append('<li class="player-stock-display">' + players[i].stocks[j] + "</li>");
             });
         });
     });
