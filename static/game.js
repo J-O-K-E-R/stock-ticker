@@ -21,18 +21,25 @@ $(document).ready(function() {
         });        
     });
 
+    socket.on("update player list", function(players) {
+        console.log(players);
+        $("#player-list").empty();
+        $.each(players, function(i) {
+            $("#player-list").append('<li class="player-display" id="' + players[i].id + '"></li>');
+            $("#" + players[i].id).append('<div class="player-name">' + players[i].id + "</div>");
+            $("#" + players[i].id).append('<div class="player-money">$' + players[i].money + "</div>");
+            $("#" + players[i].id).append('<ul class="player-stocks"></ul>')
+            $.each(players[i].stocks, function(j) {
+                $("#" + players[i].id + "> ul").append('<div class="player-stock-display">' + players[i].stocks[j] + "</div>");
+            });
+        });
+    });
+
     // updates the game with the result of the roll
     socket.on("update", function(result) {
         $("#" + result.stock).text(result.stockvalue);
         $("#roll-stock").text(result.stock);
         $("#roll-dir").text(result.direction);
         $("#roll-num").text(result.delta);
-    });
-
-    socket.on("new player", function(players) {
-        $.each(players, function(i) {
-            $("#player-list").empty();
-            $("#player-list").append("<li>" + i.name + "</li>");
-        });
     });
 });

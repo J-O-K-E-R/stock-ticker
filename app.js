@@ -42,20 +42,19 @@ var players = [];
 console.log(players.length);
 
 io.on("connection", function(socket) {
-    players.push(new player.Player(socket.id,"Player ",2000,[0,0,0,0,0,0]));
+    players.push(new player.Player(socket.id,"Player ",2000,[0,1000,0,500,0,3500]));
     console.log("a player connected");
-    console.log(players.length);
-    // sends new player info to all clients
-    io.sockets.emit("new player", players);
-
-    socket.on("disconnect", function() {
-        playerDisconnect(socket.id);
-        console.log("a player disconnected");
-        console.log(players.length);
-    });
 
     // sends the value of the stocks to the client when it connects/refreshes
     socket.emit("load", stocksvalue);
+    // notifies all clients when a player joins
+    io.sockets.emit("update player list", players);
+
+    socket.on("disconnect", function() {
+        playerDisconnect(socket.id);
+        io.sockets.emit("update player list", players);
+        console.log("a player disconnected");
+    });
 
     // rolls the dice, updates values, sends result back to client
     socket.on("roll", function(data) {
