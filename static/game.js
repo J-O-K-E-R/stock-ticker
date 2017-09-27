@@ -10,8 +10,16 @@ var stocks = [
 ];
 
 $(document).ready(function() {
-    $("#roll").on("click", function() {
-        socket.emit("roll", "player rolled");
+    // sets up event listeners for buy/sell buttons
+    $.each(stocks, function(i) {
+        $("#buy-" + stocks[i].toLowerCase()).on("click", function() {
+            socket.emit("buy stock", i);
+            console.log("buying stock " + i);
+        });
+        $("#sell-" + stocks[i].toLowerCase()).on("click", function() {
+            socket.emit("sell stock", i);
+            console.log("selling stock " + i);
+        })
     });
 
     // display the value of the stocks when the page loads
@@ -21,17 +29,15 @@ $(document).ready(function() {
         });        
     });
 
-    socket.on("update player list", function(players) {
-        console.log(players);
-        $("#player-list").empty();
+    socket.on("render player", function(players) {
         $.each(players, function(i) {
-            $("#player-list").append('<li class="player-display" id="' + players[i].id + '"></li>');
-            $("#" + players[i].id).append('<div class="player-name">' + players[i].id + "</div>");
-            $("#" + players[i].id).append('<div class="player-money">$' + players[i].money + "</div>");
-            $("#" + players[i].id).append('<ul class="player-stocks"></ul>')
-            $.each(players[i].stocks, function(j) {
-                $("#" + players[i].id + "> ul").append('<li class="player-stock-display">' + players[i].stocks[j] + "</li>");
-            });
+            if (players[i].id === socket.id) {
+                $(".player-name").text(players[i].id);
+                $(".player-money").text(players[i].money);
+                $.each(players[i].stocks, function(j) {
+                    $("#player-" + stocks[j].toLowerCase()).text(players[i].stocks[j]);
+                });
+            }
         });
     });
 

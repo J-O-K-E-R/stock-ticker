@@ -38,17 +38,16 @@ var rollNum;
 var delta;
 var result = {};
 
-var players = [];
-console.log(players.length);
+var players = []
 
 io.on("connection", function(socket) {
-    players.push(new player.Player(socket.id,"Player ",2000,[0,1000,0,500,0,3500]));
+    players.push(new player.Player(socket.id,"Player ",5000,[0,0,0,0,0,0]));
     console.log("a player connected");
 
     // sends the value of the stocks to the client when it connects/refreshes
     socket.emit("load", stocksvalue);
-    // notifies all clients when a player joins
-    io.sockets.emit("update player list", players);
+
+    socket.emit("render player", players);
 
     socket.on("disconnect", function() {
         playerDisconnect(socket.id);
@@ -56,10 +55,22 @@ io.on("connection", function(socket) {
         console.log("a player disconnected");
     });
 
-    // rolls the dice, updates values, sends result back to client
-    socket.on("roll", function(data) {
-        rollDice();
-        io.sockets.emit("update", result);
+    socket.on("buy stock", function(index) {
+        players.forEach(function(player) {
+            if (player.id === socket.id) {
+                player.buyStock(index, stocksvalue[index]);
+                socket.emit("render player", players);
+            }
+        });
+    });
+
+    socket.on("sell stock", function(index) {
+        players.forEach(function(player) {
+            if (player.id === socket.id) {
+                player.sellStock(index, stocksvalue[index]);
+                socket.emit("render player", players);
+            }
+        });
     });
 });
 
@@ -67,7 +78,7 @@ io.on("connection", function(socket) {
 setInterval(function() {
     rollDice();
     io.sockets.emit("update", result);
-}, 3000);
+}, 2000);
 
 // rolls dice, updates values and sends the result to the client
 function rollDice() {
@@ -77,7 +88,7 @@ function rollDice() {
         "delta": 0,
         "stockvalue": 0
     }
-    rollStock = rollDie();
+    rollStock = rollDie() - 1;
     rollDir = Math.ceil(rollDie() / 2);
     rollNum = Math.ceil(rollDie() / 2);
     if (rollNum == 1) {
@@ -91,16 +102,18 @@ function rollDice() {
         stocksvalue[rollStock] += delta;
         if ( stocksvalue[rollStock] >= 200 ) {
             stocksvalue[rollStock] = 100;
+            stockSplit(rollStock);
         }
         result.direction = "UP";
     } else if (rollDir == 2) {
         stocksvalue[rollStock] -= delta;
         if ( stocksvalue[rollStock] <= 0 ) {
             stocksvalue[rollStock] = 100;
+            stockCrash(rollStock);
         }
         result.direction = "DOWN";
     } else {
-        // TODO: handle dividends
+        dividends(rollStock, delta);
         result.direction = "DIV";
     }
     result.stock = stocksname[rollStock];
@@ -118,4 +131,25 @@ function playerDisconnect(id) {
         return i.id === id;
     });
     players.splice(index,1);
+}
+
+function stockSplit(index) {
+    players.forEach(function(player) {
+        player.stocks[index] *= 2;
+    });
+    io.sockets.emit("render player", players);
+}
+
+function stockCrash(index) {
+    players.forEach(function(player) {
+        player.stocks[index] = 0;        
+    });
+    io.sockets.emit("render player", players);
+}
+
+function dividends(index, amount) {
+    players.forEach(function(player) {
+        player.money += player.stocks[index] * amount / 100;
+    });
+    io.sockets.emit("render player", players);
 }
