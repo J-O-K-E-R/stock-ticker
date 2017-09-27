@@ -11,9 +11,18 @@ var player = require("./player.js");
 
 app.set("port", 3000);
 app.use("/static", express.static(__dirname + "/static"));
+app.set("view engine", "ejs");
+
+app.get("/play", function(req, res) {
+    res.sendFile(path.join(__dirname, "/static/index.html"));
+});
+
+app.post("/play", function(req, res) {
+    res.redirect("/");
+});
 
 app.get("/", function(req, res) {
-    res.sendFile(path.join(__dirname, "/static/index.html"));
+    res.render("home");
 });
 
 server.listen(3000, function() {
