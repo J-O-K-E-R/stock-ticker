@@ -134,9 +134,7 @@ io.on("connection", function(socket) {
     socket.on("update player", function(userid) {
         var y = players.find(function(player) {return player.id == userid});
         User.findById(userid, function(err, user) {
-            if (err) {
-                console.log(err);
-            } else {
+            if (y) {
                 y.money = user.money;
                 y.stocks = user.stocks;
                 socket.emit("render player", y);
