@@ -21,7 +21,7 @@ var io = socketIO(server);
 
 mongoose.connect("mongodb://develop:brockolovestacos@test-shard-00-00-4gsmp.mongodb.net:27017,test-shard-00-01-4gsmp.mongodb.net:27017,test-shard-00-02-4gsmp.mongodb.net:27017/stock-ticker?ssl=true&replicaSet=test-shard-0&authSource=admin");
 app.use(bodyParser.urlencoded({extended: true}));
-app.set("port", 3000);
+app.set("port", (process.env.PORT || 5000));
 app.use("/static", express.static(__dirname + "/static"));
 app.set("view engine", "ejs");
 
@@ -50,8 +50,8 @@ app.get("/play", isLoggedIn, function(req, res) {
 app.use(routes);
 app.use("/api", apiRoutes);
 
-server.listen(3000, function() {
-    console.log("Starting server on port 3000");
+server.listen(app.get("port"), function() {
+    console.log("Starting server on port ", app.get("port"));
 });
 
 // server game logic
