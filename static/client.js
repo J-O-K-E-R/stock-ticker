@@ -10,16 +10,17 @@ var stocks = [
 ];
 
 $(document).ready(function() {
+    socket.emit("push user", userid);
     // sets up event listeners for buy/sell buttons
     $.each(stocks, function(i) {
         $("#buy-" + stocks[i].toLowerCase()).on("click", function() {
-            socket.emit("buy stock", i);
+            socket.emit("buy stock", {i: i, userid: userid});
             console.log("buying stock " + i);
         });
         $("#sell-" + stocks[i].toLowerCase()).on("click", function() {
-            socket.emit("sell stock", i);
+            socket.emit("sell stock", {i: i, userid: userid});
             console.log("selling stock " + i);
-        })
+        });
     });
 
     // display the value of the stocks when the page loads
@@ -29,15 +30,11 @@ $(document).ready(function() {
         });        
     });
 
-    socket.on("render player", function(players) {
-        $.each(players, function(i) {
-            if (players[i].id === socket.id) {
-                $(".player-name").text(players[i].id);
-                $(".player-money").text(players[i].money);
-                $.each(players[i].stocks, function(j) {
-                    $("#player-" + stocks[j].toLowerCase()).text(players[i].stocks[j]);
-                });
-            }
+    socket.on("render player", function(player) {
+        $(".player-name").text(player.name);
+        $(".player-money").text(player.money);
+        $.each(stocks, function(i) {
+            $("#player-" + stocks[i].toLowerCase()).text(player.stocks[i]);
         });
     });
 
@@ -47,5 +44,17 @@ $(document).ready(function() {
         $("#roll-stock").text(result.stock);
         $("#roll-dir").text(result.direction);
         $("#roll-num").text(result.delta);
+    });
+
+    socket.on("dividends", function() {
+        socket.emit("update player", userid);
+    });
+
+    socket.on("crash", function() {
+        socket.emit("update player", userid);
+    });
+
+    socket.on("split", function() {
+        socket.emit("update player", userid);
     });
 });

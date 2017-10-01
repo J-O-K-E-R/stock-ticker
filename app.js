@@ -2,29 +2,54 @@ var express = require("express");
 var http = require("http");
 var path = require("path");
 var socketIO = require("socket.io");
+var mongoose = require("mongoose");
+var passport = require("passport");
+var LocalStrategy = require("passport-local");
+var bodyParser = require("body-parser");
 
+var User = require("./models/user");
+
+var routes = require("./routes/index");
+var apiRoutes = require("./routes/api");
+
+var player = require("./player.js");
 
 var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
-var player = require("./player.js");
-
+mongoose.connect("mongodb://develop:brockolovestacos@test-shard-00-00-4gsmp.mongodb.net:27017,test-shard-00-01-4gsmp.mongodb.net:27017,test-shard-00-02-4gsmp.mongodb.net:27017/stock-ticker?ssl=true&replicaSet=test-shard-0&authSource=admin");
+app.use(bodyParser.urlencoded({extended: true}));
 app.set("port", 3000);
 app.use("/static", express.static(__dirname + "/static"));
 app.set("view engine", "ejs");
 
+app.use(require("express-session")({
+    secret: "deschutes descores",
+    resave: false,
+    saveUninitialize: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use(function(req, res, next) {
+    res.locals.currentUser = req.user;
+    next();
+});
+
 app.get("/play", function(req, res) {
-    res.sendFile(path.join(__dirname, "/static/index.html"));
+    // res.sendFile(path.join(__dirname, "/static/index.html"));
+    console.log(req.user.username);
+    res.render("index", {
+        currentUser: req.user
+    });
 });
 
-app.post("/play", function(req, res) {
-    res.redirect("/");
-});
-
-app.get("/", function(req, res) {
-    res.render("home");
-});
+app.use(routes);
+app.use("/api", apiRoutes);
 
 server.listen(3000, function() {
     console.log("Starting server on port 3000");
@@ -51,13 +76,24 @@ var result = {};
 var players = []
 
 io.on("connection", function(socket) {
-    players.push(new player.Player(socket.id,"Player ",5000,[0,0,0,0,0,0]));
-    console.log("a player connected");
+    socket.on("push user", function(userid) {
+        User.findById(userid, function(err, user) {
+            if (err) {
+                console.log(err);
+            } else {
+                players.push(new player.Player(user._id, user.username, user.money, user.stocks));
+                console.log("player loaded");
+                socket.emit("render player", players.find(function(player) {return player.id === user._id}));
+            }
+        });
+        console.log(players);
+    });
+    // players.push(new player.Player(socket.id,"Player ",5000,[0,0,0,0,0,0]));
+    // console.log("a player connected");
 
-    // sends the value of the stocks to the client when it connects/refreshes
     socket.emit("load", stocksvalue);
 
-    socket.emit("render player", players);
+    // socket.emit("render player", "hi");
 
     socket.on("disconnect", function() {
         playerDisconnect(socket.id);
@@ -65,21 +101,34 @@ io.on("connection", function(socket) {
         console.log("a player disconnected");
     });
 
-    socket.on("buy stock", function(index) {
-        players.forEach(function(player) {
-            if (player.id === socket.id) {
-                player.buyStock(index, stocksvalue[index]);
-                socket.emit("render player", players);
+    socket.on("buy stock", function(data) {
+        var x = players.find(function(player) {return player.id == data.userid});
+        x.buyStock(data.i, stocksvalue[data.i]);
+        socket.emit("render player", x);
+        User.findByIdAndUpdate(data.userid, {money: x.money, stocks: x.stocks}, function(err, user) {
+            if (err) {
+                console.log(err);
             }
         });
     });
 
-    socket.on("sell stock", function(index) {
-        players.forEach(function(player) {
-            if (player.id === socket.id) {
-                player.sellStock(index, stocksvalue[index]);
-                socket.emit("render player", players);
+    socket.on("sell stock", function(data) {
+        var z = players.find(function(player) {return player.id == data.userid});
+        z.sellStock(data.i, stocksvalue[data.i]);
+        socket.emit("render player", z);
+        User.findByIdAndUpdate(data.userid, {money: z.money, stocks: z.stocks}, function(err, user) {
+            if (err) {
+                console.log(err);
             }
+        });
+    });
+
+    socket.on("update player", function(userid) {
+        var y = players.find(function(player) {return player.id == userid});
+        User.findById(userid, function(err, user) {
+            y.money = user.money;
+            y.stocks = user.stocks;
+            socket.emit("render player", y);
         });
     });
 });
@@ -144,22 +193,32 @@ function playerDisconnect(id) {
 }
 
 function stockSplit(index) {
-    players.forEach(function(player) {
-        player.stocks[index] *= 2;
+    User.find(function(err, users) {
+        users.forEach(function(user) {
+            user.stocks[index] *= 2;
+            user.save();
+        });
+        io.sockets.emit("split");
     });
-    io.sockets.emit("render player", players);
 }
 
 function stockCrash(index) {
-    players.forEach(function(player) {
-        player.stocks[index] = 0;        
+    User.find(function(err, users) {
+        users.forEach(function(user) {
+            user.stocks[index] = 0;
+            user.save();
+        });
+        io.sockets.emit("crash");
     });
-    io.sockets.emit("render player", players);
 }
 
 function dividends(index, amount) {
-    players.forEach(function(player) {
-        player.money += player.stocks[index] * amount / 100;
+    User.find(function(err, users) {
+        users.forEach(function(user) {
+            user.money += user.stocks[index] * amount / 100;
+            user.save();
+        });
+        io.sockets.emit("dividends");
     });
-    io.sockets.emit("render player", players);
 }
+

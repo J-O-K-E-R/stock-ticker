@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Ticker</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <ul class="stock-container">
+            <li class="stock-element">
+                <div class="stock-value" id="Grain"></div>
+                <div class="stock-name">grain</div>
+            </li>
+            <li class="stock-element">
+                <div class="stock-value" id="Industrial"></div>
+                <div class="stock-name">industrial</div>
+            </li>
+            <li class="stock-element">
+                <div class="stock-value" id="Bonds"></div>
+                <div class="stock-name">bonds</div>
+            </li>
+            <li class="stock-element">
+                <div class="stock-value" id="Oil"></div>
+                <div class="stock-name">oil</div>
+            </li>
+            <li class="stock-element">
+                <div class="stock-value" id="Silver"></div>
+                <div class="stock-name">silver</div>
+            </li>
+            <li class="stock-element">
+                <div class="stock-value" id="Gold"></div>
+                <div class="stock-name">gold</div>
+            </li>
+        </ul>
+        <div class="roll-container">
+            <div class="roll-display">
+                <div id="roll-stock"></div>
+                <div id="roll-dir"></div>
+                <div id="roll-num"></div>
+            </div>
+        </div>
+        <div class="player-container">
+            <div class="player-name"></div>
+            <div class="player-money"></div>
+            <ul class="player-stocks">
+                <li class="player-stock">
+                    <div id ="player-grain"></div>
+                    <div>Grain</div>
+                    <button class="button buy" id="buy-grain">Buy</button>
+                    <button class="button sell" id="sell-grain">Sell</button>
+                </li>
+                <li class="player-stock">
+                    <div id="player-industrial"></div>
+                    <div>Industrial</div>
+                    <button class="button buy" id="buy-industrial">Buy</button>
+                    <button class="button sell" id="sell-industrial">Sell</button>
+                </li>
+                <li class="player-stock">
+                    <div id="player-bonds"></div>
+                    <div>Bonds</div>
+                    <button class="button buy" id="buy-bonds">Buy</button>
+                    <button class="button sell" id="sell-bonds">Sell</button>
+                </li>
+                <li class="player-stock">
+                    <div id="player-oil"></div>
+                    <div>Oil</div>
+                    <button class="button buy" id="buy-oil">Buy</button>
+                    <button class="button sell" id="sell-oil">Sell</button>
+                </li>
+                <li class="player-stock">
+                    <div id="player-silver"></div>
+                    <div>Silver</div>
+                    <button class="button buy" id="buy-silver">Buy</button>
+                    <button class="button sell" id="sell-silver">Sell</button>
+                </li>
+                <li class="player-stock">
+                    <div id="player-gold"></div>
+                    <div>Gold</div>
+                    <button class="button buy" id="buy-gold">Buy</button>
+                    <button class="button sell" id="sell-gold">Sell</button>
+                </li>
+            </ul>
+        </div>
+        <div class="others-container">
+            
+        </div>
+    </div>
+</body>
+<script>
+    var userid = "<%= currentUser._id %>"
+</script>
+<script src="/static/client.js"></script>
+</html>
