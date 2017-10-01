@@ -150,7 +150,7 @@ setInterval(function() {
         foundStocks.values = stocksvalue;
         foundStocks.save();
     });
-}, 10000);
+}, 3000);
 
 // rolls dice, updates values and sends the result to the client
 function rollDice() {
