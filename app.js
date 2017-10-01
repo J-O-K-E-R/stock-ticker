@@ -8,6 +8,7 @@ var LocalStrategy = require("passport-local");
 var bodyParser = require("body-parser");
 
 var User = require("./models/user");
+var Stocks = require("./models/stock");
 
 var routes = require("./routes/index");
 var apiRoutes = require("./routes/api");
@@ -63,7 +64,16 @@ var stocksname = [
     "Gold"
 ];
 
-var stocksvalue = [100,100,100,100,100,100];
+// Stocks.findOne({name: "main"}, function(err, foundStocks) {
+//     foundStocks.values = [100, 100, 100, 100, 100, 100];
+//     foundStocks.save();
+// });
+
+var stocksvalue;
+Stocks.findOne({name: "main"}, function(err, foundStocks) {
+    stocksvalue = foundStocks.values;
+    console.log("loaded stock values: " + stocksvalue);
+});
 
 var rollStock;
 var rollDir;
@@ -131,11 +141,16 @@ io.on("connection", function(socket) {
     });
 });
 
+
 // rolls the dice every 3 seconds
 setInterval(function() {
     rollDice();
     io.sockets.emit("update", result);
-}, 2000);
+    Stocks.findOne({name: "main"}, function(err, foundStocks) {
+        foundStocks.values = stocksvalue;
+        foundStocks.save();
+    });
+}, 10000);
 
 // rolls dice, updates values and sends the result to the client
 function rollDice() {
