@@ -40,9 +40,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get("/play", function(req, res) {
-    // res.sendFile(path.join(__dirname, "/static/index.html"));
-    console.log(req.user.username);
+app.get("/play", isLoggedIn, function(req, res) {
     res.render("index", {
         currentUser: req.user
     });
@@ -222,3 +220,9 @@ function dividends(index, amount) {
     });
 }
 
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("login");
+}
