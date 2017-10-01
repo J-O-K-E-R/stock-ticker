@@ -187,7 +187,9 @@ function rollDice() {
         }
         result.direction = "DOWN";
     } else {
-        dividends(rollStock, delta);
+        if (stocksvalue[rollStock] >= 100) {
+            dividends(rollStock, delta);            
+        }
         result.direction = "DIV";
     }
     result.stock = stocksname[rollStock];
