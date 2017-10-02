@@ -39,7 +39,7 @@ $(document).ready(function() {
     });
 
     // updates the game with the result of the roll
-    socket.on("update", function(result) {
+    socket.on("roll", function(result) {
         $("#" + result.stock).text(result.stockvalue);
         $("#roll-stock").text(result.stock);
         $("#roll-dir").text(result.direction);
@@ -56,5 +56,6 @@ $(document).ready(function() {
 
     socket.on("split", function() {
         socket.emit("update player", userid);
+        console.log("stock split");
     });
 });

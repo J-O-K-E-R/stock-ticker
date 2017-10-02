@@ -19,7 +19,11 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
-mongoose.connect("mongodb://develop:brockolovestacos@test-shard-00-00-4gsmp.mongodb.net:27017,test-shard-00-01-4gsmp.mongodb.net:27017,test-shard-00-02-4gsmp.mongodb.net:27017/stock-ticker?ssl=true&replicaSet=test-shard-0&authSource=admin");
+var dbUrl = process.env.DATABASEURL;
+console.log(dbUrl);
+// mongoose.connect(dbUrl);
+mongoose.connect("mongodb://localhost/stock-ticker");
+// mongoose.connect("mongodb://develop:brockolovestacos@test-shard-00-00-4gsmp.mongodb.net:27017,test-shard-00-01-4gsmp.mongodb.net:27017,test-shard-00-02-4gsmp.mongodb.net:27017/stock-ticker?ssl=true&replicaSet=test-shard-0&authSource=admin");
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("port", (process.env.PORT || 5000));
 app.use("/static", express.static(__dirname + "/static"));
@@ -54,8 +58,7 @@ server.listen(app.get("port"), function() {
     console.log("Starting server on port ", app.get("port"));
 });
 
-// server game logic
-var stocksname = [
+var stockNames = [
     "Grain",
     "Industrial",
     "Bonds",
@@ -64,16 +67,11 @@ var stocksname = [
     "Gold"
 ];
 
+var stockValues = [195,195,195,195,195,195];
 // Stocks.findOne({name: "main"}, function(err, foundStocks) {
-//     foundStocks.values = [100, 100, 100, 100, 100, 100];
-//     foundStocks.save();
+//     stockValues = foundStocks.values;
+//     console.log("loaded stock values: " + stockValues);
 // });
-
-var stocksvalue;
-Stocks.findOne({name: "main"}, function(err, foundStocks) {
-    stocksvalue = foundStocks.values;
-    console.log("loaded stock values: " + stocksvalue);
-});
 
 var rollStock;
 var rollDir;
@@ -90,67 +88,65 @@ io.on("connection", function(socket) {
                 console.log(err);
             } else {
                 players.push(new player.Player(user._id, user.username, user.money, user.stocks));
-                console.log("player loaded");
+                console.log("player connected");
                 socket.emit("render player", players.find(function(player) {return player.id === user._id}));
             }
         });
-        console.log(players);
     });
-    // players.push(new player.Player(socket.id,"Player ",5000,[0,0,0,0,0,0]));
-    // console.log("a player connected");
 
-    socket.emit("load", stocksvalue);
-
-    // socket.emit("render player", "hi");
+    socket.emit("load", stockValues);
 
     socket.on("disconnect", function() {
         playerDisconnect(socket.id);
-        io.sockets.emit("update player list", players);
-        console.log("a player disconnected");
+        console.log("player disconnected");
     });
 
     socket.on("buy stock", function(data) {
-        var x = players.find(function(player) {return player.id == data.userid});
-        x.buyStock(data.i, stocksvalue[data.i]);
-        socket.emit("render player", x);
-        User.findByIdAndUpdate(data.userid, {money: x.money, stocks: x.stocks}, function(err, user) {
-            if (err) {
-                console.log(err);
-            }
-        });
+        var player = players.find(function(player) {return player.id == data.userid});
+        if(player) {
+            player.buyStock(data.i, stockValues[data.i]);
+            socket.emit("render player", player);
+            User.findByIdAndUpdate(data.userid, {money: player.money, stocks: player.stocks}, function(err, user) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
     });
 
     socket.on("sell stock", function(data) {
-        var z = players.find(function(player) {return player.id == data.userid});
-        z.sellStock(data.i, stocksvalue[data.i]);
-        socket.emit("render player", z);
-        User.findByIdAndUpdate(data.userid, {money: z.money, stocks: z.stocks}, function(err, user) {
-            if (err) {
-                console.log(err);
-            }
-        });
+        var player = players.find(function(player) {return player.id == data.userid});
+        if(player) {
+            player.sellStock(data.i, stockValues[data.i]);
+            socket.emit("render player", player);
+            User.findByIdAndUpdate(data.userid, {money: player.money, stocks: player.stocks}, function(err, user) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
     });
 
     socket.on("update player", function(userid) {
-        var y = players.find(function(player) {return player.id == userid});
+        var player = players.find(function(player) {return player.id == userid});
         User.findById(userid, function(err, user) {
-            if (y) {
-                y.money = user.money;
-                y.stocks = user.stocks;
-                socket.emit("render player", y);
+            if (player) {
+                player.money = user.money;
+                player.stocks = user.stocks;
+                console.log(player.stocks);
+                socket.emit("render player", player);
             }
         });
     });
 });
 
-
 // rolls the dice every 3 seconds
 setInterval(function() {
     rollDice();
-    io.sockets.emit("update", result);
-    Stocks.findOne({name: "main"}, function(err, foundStocks) {
-        foundStocks.values = stocksvalue;
-        foundStocks.save();
+    io.sockets.emit("roll", result);
+    Stocks.findOne({name: "main"}, function(err, stocks) {
+        stocks.values = stockValues;
+        stocks.save();
     });
 }, 2500);
 
@@ -173,28 +169,28 @@ function rollDice() {
         delta = 20;
     }
     if (rollDir == 1) {
-        stocksvalue[rollStock] += delta;
-        if ( stocksvalue[rollStock] >= 200 ) {
-            stocksvalue[rollStock] = 100;
+        stockValues[rollStock] += delta;
+        if ( stockValues[rollStock] >= 200 ) {
+            stockValues[rollStock] = 100;
             stockSplit(rollStock);
         }
         result.direction = "UP";
     } else if (rollDir == 2) {
-        stocksvalue[rollStock] -= delta;
-        if ( stocksvalue[rollStock] <= 0 ) {
-            stocksvalue[rollStock] = 100;
+        stockValues[rollStock] -= delta;
+        if ( stockValues[rollStock] <= 0 ) {
+            stockValues[rollStock] = 100;
             stockCrash(rollStock);
         }
         result.direction = "DOWN";
     } else {
-        if (stocksvalue[rollStock] >= 100) {
+        if (stockValues[rollStock] >= 100) {
             dividends(rollStock, delta);            
         }
         result.direction = "DIV";
     }
-    result.stock = stocksname[rollStock];
+    result.stock = stockNames[rollStock];
     result.delta = delta;
-    result.stockvalue = stocksvalue[rollStock];
+    result.stockvalue = stockValues[rollStock];
 };
 
 function rollDie() {
@@ -213,9 +209,18 @@ function stockSplit(index) {
     User.find(function(err, users) {
         users.forEach(function(user) {
             user.stocks[index] *= 2;
-            user.save();
+            user.save(function(err, user, numAffected) {
+                if(err) {
+                    console.log(err);
+                }
+            });
+            console.log("updated: " + user.username + " " + user.stocks[index]);
         });
         io.sockets.emit("split");
+        users.forEach(function(user) {
+            console.log(user.stocks[index]);
+        });
+        console.log("split complete");
     });
 }
 
