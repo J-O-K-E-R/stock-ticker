@@ -1,6 +1,6 @@
-var socket = io();
+const socket = io();
 
-var stocks = [
+const stocks = [
     "Grain",
     "Industrial",
     "Bonds",
@@ -11,7 +11,7 @@ var stocks = [
 
 $(document).ready(function() {
     socket.emit("push user", userid);
-    // sets up event listeners for buy/sell buttons
+
     $.each(stocks, function(i) {
         $("#buy-" + stocks[i].toLowerCase()).on("click", function() {
             socket.emit("buy stock", {i: i, userid: userid});
@@ -23,7 +23,6 @@ $(document).ready(function() {
         });
     });
 
-    // display the value of the stocks when the page loads
     socket.on("load", function(stocksvalue) {
         $.each(stocks, function(i) {
             $("#" + stocks[i]).text(stocksvalue[i]);
@@ -38,7 +37,6 @@ $(document).ready(function() {
         });
     });
 
-    // updates the game with the result of the roll
     socket.on("roll", function(result) {
         $("#" + result.stock).text(result.stockvalue);
         $("#roll-stock").text(result.stock);
@@ -46,6 +44,7 @@ $(document).ready(function() {
         $("#roll-num").text(result.delta);
     });
 
+    // Could use only one event for div/split/crash, but will keep seperate in case we need to pass specific data with them
     socket.on("dividends", function() {
         socket.emit("update player", userid);
     });
@@ -54,8 +53,7 @@ $(document).ready(function() {
         socket.emit("update player", userid);
     });
 
-    socket.on("split", function() {
+    socket.on("split", function(data) {
         socket.emit("update player", userid);
-        console.log("stock split");
     });
 });

@@ -1,25 +1,25 @@
-var express = require("express");
-var http = require("http");
-var path = require("path");
-var socketIO = require("socket.io");
-var mongoose = require("mongoose");
-var passport = require("passport");
-var LocalStrategy = require("passport-local");
-var bodyParser = require("body-parser");
+const express = require("express");
+const http = require("http");
+const path = require("path");
+const socketIO = require("socket.io");
+const mongoose = require("mongoose");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const bodyParser = require("body-parser");
 
-var User = require("./models/user");
-var Stocks = require("./models/stock");
+const User = require("./models/user");
+const Stocks = require("./models/stock");
 
-var routes = require("./routes/index");
-var apiRoutes = require("./routes/api");
+const routes = require("./routes/index");
+const apiRoutes = require("./routes/api");
 
-var player = require("./player.js");
+const player = require("./player.js");
 
-var app = express();
-var server = http.Server(app);
-var io = socketIO(server);
+const app = express();
+const server = http.Server(app);
+const io = socketIO(server);
 
-var dbUrl = process.env.DATABASEURL;
+const dbUrl = process.env.DATABASEURL;
 console.log(dbUrl);
 // mongoose.connect(dbUrl);
 mongoose.connect("mongodb://localhost/stock-ticker");
@@ -58,7 +58,7 @@ server.listen(app.get("port"), function() {
     console.log("Starting server on port ", app.get("port"));
 });
 
-var stockNames = [
+const stockNames = [
     "Grain",
     "Industrial",
     "Bonds",
@@ -67,19 +67,19 @@ var stockNames = [
     "Gold"
 ];
 
-var stockValues = [195,195,195,195,195,195];
+let stockValues = [5,5,5,195,195,195];
 // Stocks.findOne({name: "main"}, function(err, foundStocks) {
 //     stockValues = foundStocks.values;
 //     console.log("loaded stock values: " + stockValues);
 // });
 
-var rollStock;
-var rollDir;
-var rollNum;
-var delta;
-var result = {};
+let rollStock;
+let rollDir;
+let rollNum;
+let delta;
+let result = {};
 
-var players = []
+let players = []
 
 io.on("connection", function(socket) {
     socket.on("push user", function(userid) {
@@ -102,7 +102,7 @@ io.on("connection", function(socket) {
     });
 
     socket.on("buy stock", function(data) {
-        var player = players.find(function(player) {return player.id == data.userid});
+        let player = players.find(function(player) {return player.id == data.userid});
         if(player) {
             player.buyStock(data.i, stockValues[data.i]);
             socket.emit("render player", player);
@@ -115,7 +115,7 @@ io.on("connection", function(socket) {
     });
 
     socket.on("sell stock", function(data) {
-        var player = players.find(function(player) {return player.id == data.userid});
+        let player = players.find(function(player) {return player.id == data.userid});
         if(player) {
             player.sellStock(data.i, stockValues[data.i]);
             socket.emit("render player", player);
@@ -128,7 +128,7 @@ io.on("connection", function(socket) {
     });
 
     socket.on("update player", function(userid) {
-        var player = players.find(function(player) {return player.id == userid});
+        let player = players.find(function(player) {return player.id == userid});
         User.findById(userid, function(err, user) {
             if (player) {
                 player.money = user.money;
@@ -140,17 +140,17 @@ io.on("connection", function(socket) {
     });
 });
 
-// rolls the dice every 3 seconds
 setInterval(function() {
     rollDice();
+    console.log(players);
     io.sockets.emit("roll", result);
+    console.log("roll complete")
     Stocks.findOne({name: "main"}, function(err, stocks) {
         stocks.values = stockValues;
         stocks.save();
     });
 }, 2500);
 
-// rolls dice, updates values and sends the result to the client
 function rollDice() {
     result = {
         "stock": "",
@@ -199,7 +199,7 @@ function rollDie() {
 
 // handles player disconnects
 function playerDisconnect(id) {
-    var index = players.findIndex(function(i) {
+    const index = players.findIndex(function(i) {
         return i.id === id;
     });
     players.splice(index,1);
@@ -208,27 +208,24 @@ function playerDisconnect(id) {
 function stockSplit(index) {
     User.find(function(err, users) {
         users.forEach(function(user) {
-            user.stocks[index] *= 2;
-            user.save(function(err, user, numAffected) {
-                if(err) {
-                    console.log(err);
-                }
+            let temp = user.stocks;
+            temp[index] *= 2;
+            User.findByIdAndUpdate(user._id, {stocks: temp}, function(err, user) {
+
             });
-            console.log("updated: " + user.username + " " + user.stocks[index]);
         });
         io.sockets.emit("split");
-        users.forEach(function(user) {
-            console.log(user.stocks[index]);
-        });
-        console.log("split complete");
     });
 }
 
 function stockCrash(index) {
     User.find(function(err, users) {
         users.forEach(function(user) {
-            user.stocks[index] = 0;
-            user.save();
+            let temp = user.stocks;
+            temp[index] = 0;
+            User.findByIdAndUpdate(user._id, {stocks: temp}, function(err, user) {
+
+            });
         });
         io.sockets.emit("crash");
     });
