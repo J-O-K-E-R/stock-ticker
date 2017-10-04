@@ -26,7 +26,8 @@ $(document).ready(function() {
     socket.on("load", function(stocksvalue) {
         $.each(stocks, function(i) {
             $("#" + stocks[i]).text(stocksvalue[i]);
-        });        
+        });
+        socket.emit("update player", userid);
     });
 
     socket.on("render player", function(player) {

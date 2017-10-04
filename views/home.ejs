@@ -12,7 +12,11 @@
         <a href="/play">Join Game</a>
         <a href="/logout">Logout</a>
         <div>
-            Signed in as <%= currentUser.username %>.
+            <% if (currentUser) { %>
+                Signed in as <%= currentUser.username %>.
+            <%} else { %>
+                Not signed in.
+            <%}%>
         </div>
     </body>
 </html>

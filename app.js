@@ -19,10 +19,10 @@ const app = express();
 const server = http.Server(app);
 const io = socketIO(server);
 
-const dbUrl = process.env.DATABASEURL;
+const dbUrl = process.env.DBURL || "mongodb://localhost/stock-ticker"
 console.log(dbUrl);
-// mongoose.connect(dbUrl);
-mongoose.connect("mongodb://localhost/stock-ticker");
+mongoose.connect(dbUrl);
+// mongoose.connect("mongodb://localhost/stock-ticker");
 // mongoose.connect("mongodb://develop:brockolovestacos@test-shard-00-00-4gsmp.mongodb.net:27017,test-shard-00-01-4gsmp.mongodb.net:27017,test-shard-00-02-4gsmp.mongodb.net:27017/stock-ticker?ssl=true&replicaSet=test-shard-0&authSource=admin");
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("port", (process.env.PORT || 5000));
@@ -67,11 +67,12 @@ const stockNames = [
     "Gold"
 ];
 
-let stockValues = [5,5,5,195,195,195];
-// Stocks.findOne({name: "main"}, function(err, foundStocks) {
-//     stockValues = foundStocks.values;
-//     console.log("loaded stock values: " + stockValues);
-// });
+let stockValues = [];
+// let stockValues = [5,5,5,195,195,195];
+Stocks.findOne({name: "main"}, function(err, foundStocks) {
+    stockValues = foundStocks.values;
+    console.log("loaded stock values: " + stockValues);
+});
 
 let rollStock;
 let rollDir;
@@ -141,6 +142,9 @@ io.on("connection", function(socket) {
 });
 
 setInterval(function() {
+    Stocks.findOne({name: "main"}, function(err, stocks) {
+        stockValues = stocks.values;
+    });
     rollDice();
     console.log(players);
     io.sockets.emit("roll", result);
@@ -150,6 +154,33 @@ setInterval(function() {
         stocks.save();
     });
 }, 2500);
+
+app.post("/admin/reset", isLoggedIn, isAdmin, function(req, res) {
+    User.find(function(err, users) {
+        users.forEach(function(user) {
+            user.money = 5000;
+            user.stocks = [0, 0, 0, 0, 0, 0]
+            user.save();
+        });
+    });
+    Stocks.findOne({name: "main"}, function(err, foundStocks) {
+        foundStocks.values = [100, 100, 100, 100, 100, 100];
+        stockValues = [100, 100, 100, 100, 100, 100];
+        foundStocks.save();
+        // io.sockets.emit("load", stockValues);    
+    });
+    players.forEach(function(player) {
+        User.findById(player.id, function(err, user) {
+            if(player) {
+                player.money = user.money;
+                player.stocks = user.stocks;
+            }
+        });
+    });
+    io.sockets.emit("dividends");
+    io.sockets.emit("load", stockValues);
+    res.send("game reset");
+});
 
 function rollDice() {
     result = {
@@ -243,6 +274,13 @@ function dividends(index, amount) {
 
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("login");
+}
+
+function isAdmin(req, res, next) {
+    if (req.user.isAdmin === true) {
         return next();
     }
     res.redirect("login");
