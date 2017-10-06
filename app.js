@@ -148,12 +148,12 @@ setInterval(function() {
     Stocks.findOne({name: "main"}, function(err, stocks) {
         stockValues = stocks.values;
     });
-    if(Object.keys(result).length !== 0) {
+    // if(Object.keys(result).length !== 0) {
         if(resultHist.length >= 5) {
             resultHist.pop();
         }
         resultHist.unshift(cloneResult(result));
-    }
+    // }
     rollDice();
     io.sockets.emit("roll", {result: result, resultHist: resultHist});
     Stocks.findOne({name: "main"}, function(err, stocks) {
@@ -161,7 +161,7 @@ setInterval(function() {
         stocks.save();
     });
     console.log(resultHist);
-}, 2500);
+}, 300000);
 
 app.post("/admin/reset", isLoggedIn, isAdmin, function(req, res) {
     User.find(function(err, users) {
