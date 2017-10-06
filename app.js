@@ -32,7 +32,7 @@ app.set("view engine", "ejs");
 app.use(require("express-session")({
     secret: "deschutes descores",
     resave: false,
-    saveUninitialize: false
+    saveUninitialize: true
 }));
 app.use(passport.initialize());
 app.use(passport.session());
