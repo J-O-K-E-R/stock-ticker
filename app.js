@@ -20,10 +20,8 @@ const server = http.Server(app);
 const io = socketIO(server);
 
 const dbUrl = process.env.DBURL || "mongodb://localhost/stock-ticker"
-console.log(dbUrl);
 mongoose.connect(dbUrl);
-// mongoose.connect("mongodb://localhost/stock-ticker");
-// mongoose.connect("mongodb://develop:brockolovestacos@test-shard-00-00-4gsmp.mongodb.net:27017,test-shard-00-01-4gsmp.mongodb.net:27017,test-shard-00-02-4gsmp.mongodb.net:27017/stock-ticker?ssl=true&replicaSet=test-shard-0&authSource=admin");
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("port", (process.env.PORT || 5000));
 app.use("/static", express.static(__dirname + "/static"));
@@ -148,19 +146,17 @@ setInterval(function() {
     Stocks.findOne({name: "main"}, function(err, stocks) {
         stockValues = stocks.values;
     });
-    // if(Object.keys(result).length !== 0) {
+    if(Object.keys(result).length !== 0) {
         if(resultHist.length >= 5) {
             resultHist.pop();
         }
         resultHist.unshift(cloneResult(result));
-    // }
+    }
     rollDice();
     io.sockets.emit("roll", {result: result, resultHist: resultHist});
-    Stocks.findOne({name: "main"}, function(err, stocks) {
-        stocks.values = stockValues;
-        stocks.save();
+    Stocks.findOneAndUpdate({name: "main"}, {values: stockValues}, function(err, stocks) {
+        
     });
-    console.log(resultHist);
 }, 300000);
 
 app.post("/admin/reset", isLoggedIn, isAdmin, function(req, res) {
@@ -244,7 +240,7 @@ function stockSplit(index) {
         users.forEach(function(user) {
             let temp = user.stocks;
             temp[index] *= 2;
-            User.findByIdAndUpdate(user._id, {stocks: temp}, function(err, user) {
+            User.findByIdAndUpdate(user._id, {stocks: temp}, function(err, user){
 
             });
         });
@@ -257,7 +253,7 @@ function stockCrash(index) {
         users.forEach(function(user) {
             let temp = user.stocks;
             temp[index] = 0;
-            User.findByIdAndUpdate(user._id, {stocks: temp}, function(err, user) {
+            User.findByIdAndUpdate(user._id, {stocks: temp}, function(err, user){
 
             });
         });

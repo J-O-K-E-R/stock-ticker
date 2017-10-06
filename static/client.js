@@ -64,7 +64,7 @@ $(document).ready(function() {
         socket.emit("update player", userid);
     });
 
-    socket.on("split", function(data) {
+    socket.on("split", function() {
         socket.emit("update player", userid);
     });
 });
