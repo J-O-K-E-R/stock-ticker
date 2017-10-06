@@ -27,6 +27,9 @@ $(document).ready(function() {
         $.each(stocks, function(i) {
             $("#" + stocks[i]).text(stocksvalue[i]);
         });
+
+        
+
         socket.emit("update player", userid);
     });
 
@@ -38,11 +41,18 @@ $(document).ready(function() {
         });
     });
 
-    socket.on("roll", function(result) {
-        $("#" + result.stock).text(result.stockvalue);
-        $("#roll-stock").text(result.stock);
-        $("#roll-dir").text(result.direction);
-        $("#roll-num").text(result.delta);
+    socket.on("roll", function(data) {
+        $("#" + data.result.stock).text(data.result.stockvalue);
+        $("#roll-stock").text(data.result.stock);
+        $("#roll-dir").text(data.result.direction);
+        $("#roll-num").text(data.result.delta);
+        $("#roll-history").empty();
+        $.each(data.resultHist, function(i) {
+            let stock = "<div>" + data.resultHist[i].stock + "</div>"
+            let dir = "<div>" + data.resultHist[i].direction + "</div>"
+            let delta = "<div>" + data.resultHist[i].delta + "</div>"
+            $("#roll-history").append($('<li id="hist-'+i+'"></li>').append(stock,dir,delta));
+        })
     });
 
     // Could use only one event for div/split/crash, but will keep seperate in case we need to pass specific data with them

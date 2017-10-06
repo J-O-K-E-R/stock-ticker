@@ -79,6 +79,7 @@ let rollDir;
 let rollNum;
 let delta;
 let result = {};
+let resultHist = [];
 
 let players = []
 
@@ -96,6 +97,8 @@ io.on("connection", function(socket) {
     });
 
     socket.emit("load", stockValues);
+
+    socket.emit("roll", {result: result, resultHist: resultHist});
 
     socket.on("disconnect", function() {
         playerDisconnect(socket.id);
@@ -145,14 +148,19 @@ setInterval(function() {
     Stocks.findOne({name: "main"}, function(err, stocks) {
         stockValues = stocks.values;
     });
+    if(Object.keys(result).length !== 0) {
+        if(resultHist.length >= 5) {
+            resultHist.pop();
+        }
+        resultHist.unshift(cloneResult(result));
+    }
     rollDice();
-    console.log(players);
-    io.sockets.emit("roll", result);
-    console.log("roll complete")
+    io.sockets.emit("roll", {result: result, resultHist: resultHist});
     Stocks.findOne({name: "main"}, function(err, stocks) {
         stocks.values = stockValues;
         stocks.save();
     });
+    console.log(resultHist);
 }, 2500);
 
 app.post("/admin/reset", isLoggedIn, isAdmin, function(req, res) {
@@ -183,12 +191,7 @@ app.post("/admin/reset", isLoggedIn, isAdmin, function(req, res) {
 });
 
 function rollDice() {
-    result = {
-        "stock": "",
-        "direction": "",
-        "delta": 0,
-        "stockvalue": 0
-    }
+    
     rollStock = rollDie() - 1;
     rollDir = Math.ceil(rollDie() / 2);
     rollNum = Math.ceil(rollDie() / 2);
@@ -284,4 +287,12 @@ function isAdmin(req, res, next) {
         return next();
     }
     res.redirect("login");
+}
+
+function cloneResult(result) {
+    let clone = {};
+    for(let key in result) {
+        clone[key] = result[key];
+    }
+    return clone;
 }
