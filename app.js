@@ -143,9 +143,9 @@ io.on("connection", function(socket) {
 });
 
 setInterval(function() {
-    Stocks.findOne({name: "main"}, function(err, stocks) {
-        stockValues = stocks.values;
-    });
+    // Stocks.findOne({name: "main"}, function(err, stocks) {
+    //     stockValues = stocks.values;
+    // });
     if(Object.keys(result).length !== 0) {
         if(resultHist.length >= 5) {
             resultHist.pop();
@@ -157,7 +157,7 @@ setInterval(function() {
     Stocks.findOneAndUpdate({name: "main"}, {values: stockValues}, function(err, stocks) {
         
     });
-}, 300000);
+}, 10000);
 
 app.post("/admin/reset", isLoggedIn, isAdmin, function(req, res) {
     User.find(function(err, users) {
