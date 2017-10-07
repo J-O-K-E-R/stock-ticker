@@ -1,8 +1,6 @@
 body {
     margin: 0;
     padding: 0;
-    /*background: url(../static/Images/vignette.png) no-repeat;
-    background-size: 100%;*/
     text-shadow: 1px 1px 2px black; 
     color: white;
 
@@ -22,6 +20,7 @@ a {
 a:hover {
     color: red;
 }
+
 .tint {
     z-index: 1;
     height: 100%;
@@ -29,6 +28,8 @@ a:hover {
     position: absolute;
     top: 0px;
     left: 0px;
+    margin: 0;
+    padding: 0;
     background: rgba(74, 75, 76, 0.7);    
 }
 
@@ -48,7 +49,7 @@ a:hover {
 }
 
 .container {
-    padding: 0px;
+    padding: 0;
     text-align: center;
 }
 
@@ -69,7 +70,7 @@ a:hover {
 .roll-display {
     margin: 0px;
     padding: 5px;
-    width: 100%;
+    width: 90%;
     text-align: center;
 }
 
