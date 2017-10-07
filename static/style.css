@@ -1,6 +1,11 @@
 body {
     margin: 0;
     padding: 0;
+    /*background: url(../static/Images/vignette.png) no-repeat;
+    background-size: 100%;*/
+    text-shadow: 1px 1px 2px black; 
+    color: white;
+
 }
 
 ul {
@@ -9,7 +14,23 @@ ul {
     margin: 0px;
     padding: 0px;
 }
-
+a {
+    color: white;
+    text-shadow: 1px 1px 4px black;
+    text-decoration:  none;
+}
+a:hover {
+    color: red;
+}
+.tint {
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: rgba(74, 75, 76, 0.7);    
+}
 .stock-element {
     display: inline-block;
     width: 16%;
