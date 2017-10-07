@@ -31,20 +31,34 @@ a:hover {
     left: 0px;
     background: rgba(74, 75, 76, 0.7);    
 }
+
 .stock-element {
     display: inline-block;
-    width: 16%;
+    width: 10%;
     text-align: center;
+    border-style: solid;
+    border-width: 2px;
+    margin:0;
+    padding: 0;
+}
+
+.stock-container {
+    padding: 0;
+    margin: 0;
 }
 
 .container {
-    margin: 20px 500px;
     padding: 0px;
+    text-align: center;
 }
 
 .roll-container {
     margin: 25px auto;
-    width: 100%;
+    text-align: center;
+}
+
+.history-boxes {
+    margin: 25px auto;
     text-align: center;
 }
 
@@ -59,6 +73,21 @@ a:hover {
     text-align: center;
 }
 
-#roll-history {
+#roll-history div {
     padding: 5px;
+    display: inline-block;
+}
+.player-money {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.player-name {
+    font-size: 25px;
+    text-decoration: underline;
+}
+
+#history-title {
+    font-size: 25px;
+    text-decoration: underline;
 }

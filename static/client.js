@@ -35,9 +35,9 @@ $(document).ready(function() {
 
     socket.on("render player", function(player) {
         $(".player-name").text(player.name);
-        $(".player-money").text(player.money);
+        $(".player-money").text("Current Money: " + player.money);
         $.each(stocks, function(i) {
-            $("#player-" + stocks[i].toLowerCase()).text(player.stocks[i]);
+            $("#player-" + stocks[i].toLowerCase()).text( stocks[i] + ": " +player.stocks[i]);
         });
     });
 

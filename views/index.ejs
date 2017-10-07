@@ -10,80 +10,90 @@
 <div class="tint">
     <a id="home" href="/">Home</a>
     <div class="container">
-        <ul class="stock-container">
-            <li class="stock-element">
-                <div class="stock-value" id="Grain"></div>
-                <div class="stock-name">grain</div>
-            </li>
-            <li class="stock-element">
-                <div class="stock-value" id="Industrial"></div>
-                <div class="stock-name">industrial</div>
-            </li>
-            <li class="stock-element">
-                <div class="stock-value" id="Bonds"></div>
-                <div class="stock-name">bonds</div>
-            </li>
-            <li class="stock-element">
-                <div class="stock-value" id="Oil"></div>
-                <div class="stock-name">oil</div>
-            </li>
-            <li class="stock-element">
-                <div class="stock-value" id="Silver"></div>
-                <div class="stock-name">silver</div>
-            </li>
-            <li class="stock-element">
-                <div class="stock-value" id="Gold"></div>
-                <div class="stock-name">gold</div>
-            </li>
-        </ul>
         <div class="roll-container">
             <div class="roll-display">
                 <div id="roll-stock"></div>
                 <div id="roll-dir"></div>
                 <div id="roll-num"></div>
             </div>
+            
+        </div>
+        <ul class="stock-container">
+            <li class="stock-element">
+                <div id="grain-box">
+                    <div class="stock-value" id="Grain"></div>
+                    <div class="stock-name">Grain</div>
+                </div>
+            </li>
+            <li class="stock-element">
+                <div id="ind-box">
+                    <div class="stock-value" id="Industrial"></div>
+                    <div class="stock-name">Industrial</div>
+                </div>
+            </li>
+            <li class="stock-element">
+                <div id="bonds-box">
+                    <div class="stock-value" id="Bonds"></div>
+                    <div class="stock-name">Bonds</div>
+                </div>
+            </li>
+            <li class="stock-element">
+                <div id="oil-box">
+                    <div class="stock-value" id="Oil"></div>
+                    <div class="stock-name">Oil</div>
+                </div>
+            </li>
+            <li class="stock-element">
+                <div id="silver-box">
+                    <div class="stock-value" id="Silver"></div>
+                    <div class="stock-name">Silver</div>
+                </div>
+            </li>
+            <li class="stock-element">
+                <div id="gold-box">
+                    <div class="stock-value" id="Gold"></div>
+                    <div class="stock-name">Gold</div>
+                </div>
+            </li>
+        </ul>
+        <div class="history-boxes">
+            <div id="history-title">Recent Changes</div>
             <ul id="roll-history">
                 
             </ul>
         </div>
         <div class="player-container">
             <div class="player-name"></div>
-            <div>Current Dosh:</div>
+            
             <div class="player-money"></div>
             <ul class="player-stocks">
                 <li class="player-stock">
                     <div id ="player-grain"></div>
-                    <div>Grain</div>
                     <button class="button buy" id="buy-grain">Buy</button>
                     <button class="button sell" id="sell-grain">Sell</button>
                 </li>
                 <li class="player-stock">
                     <div id="player-industrial"></div>
-                    <div>Industrial</div>
                     <button class="button buy" id="buy-industrial">Buy</button>
                     <button class="button sell" id="sell-industrial">Sell</button>
                 </li>
                 <li class="player-stock">
                     <div id="player-bonds"></div>
-                    <div>Bonds</div>
                     <button class="button buy" id="buy-bonds">Buy</button>
                     <button class="button sell" id="sell-bonds">Sell</button>
                 </li>
                 <li class="player-stock">
                     <div id="player-oil"></div>
-                    <div>Oil</div>
                     <button class="button buy" id="buy-oil">Buy</button>
                     <button class="button sell" id="sell-oil">Sell</button>
                 </li>
                 <li class="player-stock">
                     <div id="player-silver"></div>
-                    <div>Silver</div>
                     <button class="button buy" id="buy-silver">Buy</button>
                     <button class="button sell" id="sell-silver">Sell</button>
                 </li>
                 <li class="player-stock">
                     <div id="player-gold"></div>
-                    <div>Gold</div>
                     <button class="button buy" id="buy-gold">Buy</button>
                     <button class="button sell" id="sell-gold">Sell</button>
                 </li>
