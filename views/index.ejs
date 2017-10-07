@@ -7,6 +7,8 @@
     <link rel="stylesheet" type="text/css" href="/static/style.css">
 </head>
 <body>
+<div class="tint">
+    <a id="home" href="/">Home</a>
     <div class="container">
         <ul class="stock-container">
             <li class="stock-element">
@@ -46,6 +48,7 @@
         </div>
         <div class="player-container">
             <div class="player-name"></div>
+            <div>Current Dosh:</div>
             <div class="player-money"></div>
             <ul class="player-stocks">
                 <li class="player-stock">
@@ -90,6 +93,7 @@
             
         </div>
     </div>
+</div>
 </body>
 <script>
     var userid = "<%= currentUser._id %>"
