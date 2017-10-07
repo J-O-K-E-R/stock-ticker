@@ -1,5 +1,6 @@
 body {
-	background: url(../static/Images/StockTickers.png); 
+	background: url(../static/Images/SMALL.JPG) no-repeat; 
+	background-size: 100%;
 	text-shadow: 1px 1px 2px black; 
 	color: white;
 	text-align: center;
