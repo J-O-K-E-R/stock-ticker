@@ -16,9 +16,15 @@ const gameClass = require("./game.js");
 const app = express();
 const server = http.Server(app);
 const io = socketIO(server);
-console.log(io);
+
 const dbUrl = process.env.DBURL || "mongodb://localhost/stock-ticker"
 mongoose.connect(dbUrl);
+
+let rollInterval = 3000;
+// uncomment this to set the roll interval to 10 minutes on the live server 
+// if (process.env.NODE_ENV === 'production') {
+//     const rollInterval = 600000;
+// }
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("port", (process.env.PORT || 5000));
@@ -92,7 +98,7 @@ io.on("connection", function(socket) {
 setInterval( function() {
     game.roll();
     io.emit("load", game.stockValues);
-}, 3000);
+}, rollInterval);
 
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
