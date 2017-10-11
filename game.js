@@ -2,6 +2,7 @@ const socketIO = require("socket.io");
 
 const User = require("./models/user");
 const Stocks = require("./models/stock");
+const Trends = require("./models/trend");
 
 const player = require("./player.js");
 
@@ -15,31 +16,46 @@ const stockNames = [
 ];
 
 exports.Game = class Game {
-    constructor() {
+    constructor(io) {
+        let temp;
         this.players = [];
-        Stocks.findOne({name: "main"}, function(err, stocks) {
-            this.stockValues = stocks.values;
+        let getStocks = new Promise(
+            (resolve, reject) => {
+                Stocks.findOne({name: "main"}, function(err, stocks) {
+                    temp = stocks.values;
+                    resolve(temp);
+                });
+            }
+        )
+        getStocks.then((temp) => {
+            this.stockValues = temp;
         });
         this.rollResult = {};
         this.rollHistory = [];
         this.io = io;
+        console.log(this.io)
     }
 
     pushPlayer(userId) {
-        User.findById(userId, function(err, user) {
-            if (err) {
-                console.log(err);
-            } else {
-                this.players.push(new player.Player(user._id, user.username, user.money, user.stocks));
+        let temp;
+        let findPlayer = new Promise(
+            (resolve, reject) => {
+                User.findById(userId, function(err, user) {
+                    temp = new player.Player(user._id, user.username, user.money, user.stocks);
+                    resolve(temp);
+                });
             }
-        });
+        );
+        findPlayer.then((temp) => {
+            this.players.push(temp);
+        })
     }
     
     dropPlayer(userId) {
-        const index = players.findIndex(function(i) {
-            return i.id === id;
+        const index = this.players.findIndex(function(i) {
+            return i.id === userId;
         });
-        players.splice(index, 1);
+        this.players.splice(index, 1);
     }
 
     roll() {
@@ -66,19 +82,19 @@ exports.Game = class Game {
             this.stockValues[stock] += delta;
             if ( this.stockValues[stock] >= 200 ) {
                 this.stockValues[stock] = 100;
-                stockSplit(stock);
+                stockSplit(stock, this.io);
             }
             this.rollResult.direction = "UP";
         } else if (dir == 2) {
             this.stockValues[stock] -= delta;
             if ( this.stockValues[stock] <= 0 ) {
                 this.stockValues[stock] = 100;
-                stockCrash(stock);
+                stockCrash(stock, this.io);
             }
             this.rollResult.direction = "DOWN";
         } else {
             if (this.stockValues[stock] >= 100) {
-                dividends(stock, delta);            
+                dividends(stock, delta, this.io);            
             }
             this.rollResult.direction = "DIV";
         }
@@ -87,17 +103,50 @@ exports.Game = class Game {
         this.rollResult.delta = delta;
         this.rollResult.newValue = this.stockValues[stock];
 
-        io.sockets.emit("roll", {roll: this.rollResult, history: this.rollHistory});
+        this.io.sockets.emit("roll", {result: this.rollResult, resultHist: this.rollHistory});
 
         Stocks.findOneAndUpdate({name: "main"}, {values: this.stockValues}, function(err, stocks) {
             if(err) {
                 console.log(err);
             }
         });
+
+        let toBeSaved = this.rollResult;
+        Trends.findOne({index: stock}, function(err, trend) {
+            if (trend.history.length >= 50) {
+                trend.history.pop();
+            }
+            trend.history.unshift(toBeSaved);
+            trend.save();
+        });
+    }
+
+    buyStock(index, userId) {
+        let player = this.players.find(function(player) {return player.id == userId});
+        player.buyStock(index, this.stockValues[index]);
+        User.findByIdAndUpdate(userId, {money: player.money, stocks: player.stocks}, function(err, user) {
+            if (err) {
+                console.log(err);
+            }
+        });
+
+        return player;
+    }
+
+    sellStock(index, userId) {
+        let player = this.players.find(function(player) {return player.id == userId});
+        player.sellStock(index, this.stockValues[index]);
+        User.findByIdAndUpdate(userId, {money: player.money, stocks: player.stocks}, function(err, user) {
+            if (err) {
+                console.log(err);
+            }
+        });
+
+        return player;
     }
 }
 
-function stockSplit(index) {
+function stockSplit(index, io) {
     User.find(function(err, users) {
         users.forEach(function(user) {
             let temp = user.stocks;
@@ -110,7 +159,7 @@ function stockSplit(index) {
     });
 }
 
-function stockCrash(index) {
+function stockCrash(index, io) {
     User.find(function(err, users) {
         users.forEach(function(user) {
             let temp = user.stocks;
@@ -123,7 +172,7 @@ function stockCrash(index) {
     });
 }
 
-function dividends(index, amount) {
+function dividends(index, amount, io) {
     User.find(function(err, users) {
         users.forEach(function(user) {
             user.money += user.stocks[index] * amount / 100;

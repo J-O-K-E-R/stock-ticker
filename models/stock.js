@@ -5,4 +5,4 @@ var StocksSchema = new mongoose.Schema({
     values: [Number]
 });
 
-module.exports = mongoose.model("Stocks", StocksSchema)
+module.exports = mongoose.model("Stocks", StocksSchema);
