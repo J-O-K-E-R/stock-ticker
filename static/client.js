@@ -68,4 +68,16 @@ $(document).ready(function() {
     socket.on("split", function() {
         socket.emit("update player", userid);
     });
+    
+    // UPDATE ALL THE TREND DISPLAYS WHEN THIS MESSAGE IS RECEIVED
+    // THIS IS ONLY SENT WHEN THE PAGE IS (RE)LOADED
+    socket.on("update trends", function(trends) {
+        console.log(trends);
+    });
+
+    // UPDATE ONLY THE LAST TREND THAT WAS ROLLED
+    // SENT AFTER EVERY ROLL
+    socket.on("update one trend", function(trend) {
+        console.log(trend);
+    });
 });

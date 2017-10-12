@@ -119,6 +119,21 @@ exports.Game = class Game {
             trend.history.unshift(toBeSaved);
             trend.save();
         });
+
+        let updateTrend = new Promise(
+            (resolve, reject) => {
+                Trends.findOne({index: stock}, function(err, trend) {
+                    if (err) {
+                        // handle error
+                    }
+                    resolve(trend);
+                });
+            }
+        )
+        updateTrend.then( (trend) => {
+            console.log(trend);
+            this.io.sockets.emit("update one trend", trend);
+        });
     }
 
     buyStock(index, userId) {
