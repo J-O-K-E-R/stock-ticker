@@ -21,7 +21,7 @@ const io = socketIO(server);
 const dbUrl = process.env.DBURL || "mongodb://localhost/stock-ticker"
 mongoose.connect(dbUrl);
 
-let rollInterval = 3000;
+let rollInterval = 10000;
 // uncomment this to set the roll interval to 10 minutes on the live server 
 // if (process.env.NODE_ENV === 'production') {
 //     const rollInterval = 600000;

@@ -82,5 +82,7 @@ $(document).ready(function() {
     });
 
     $("#webTicker").webTicker({
-        hoverpause:true});
+        height:'75px',
+        speed:'100',
+    });
 });

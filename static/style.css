@@ -94,3 +94,7 @@ a:hover {
     font-size: 25px;
     text-decoration: underline;
 }
+#webTicker li{
+    color: white;
+    font-size: 50px
+}
