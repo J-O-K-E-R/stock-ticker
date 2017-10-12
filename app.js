@@ -27,6 +27,8 @@ let rollInterval = 3000;
 //     const rollInterval = 600000;
 // }
 
+// test
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("port", (process.env.PORT || 5000));
 app.use("/static", express.static(__dirname + "/static"));
