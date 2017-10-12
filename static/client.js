@@ -77,6 +77,10 @@ $(document).ready(function() {
     // UPDATE ONLY THE LAST TREND THAT WAS ROLLED
     // SENT AFTER EVERY ROLL
     socket.on("update one trend", function(trend) {
+        $("#Ticker").text(trend.history[0].stock  + " " + trend.history[0].direction  + " " + trend.history[0].delta)
         console.log(trend.history[0].newValue + ", " + trend.history[0].stock);
     });
+
+    $("#webTicker").webTicker({
+        hoverpause:true});
 });

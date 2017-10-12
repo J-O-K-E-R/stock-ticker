@@ -4,6 +4,7 @@
     <title>Stock Ticker</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./node_modules/webTicker/jquery.webticker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
     <link rel="icon" href="/static/Images/thonk.png">
 </head>
@@ -11,6 +12,11 @@
 <div class="tint">
     <a id="home" href="/">Home</a>
     <div class="container">
+        <ul id="webTicker">
+            <li id="Ticker"></li>
+        </ul>
+
+
         <div class="roll-container">
             <div class="roll-display">
                 <div id="roll-stock"></div>
