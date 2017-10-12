@@ -27,23 +27,7 @@ let rollInterval = 10000;
 //     const rollInterval = 600000;
 // }
 
-// UNCOMMENT THIS AND RUN SERVER ONCE TO SEED THE DATABASE WITH THE TRENDS MODEL
-//
-// const Trends = require("./models/trend.js");
-// const arr = [
-//     {"index":0,"name":"grain", "history":[]},
-//     {"index":1,"name":"industrial", "history":[]},
-//     {"index":2,"name":"bonds", "history":[]},
-//     {"index":3,"name":"oil", "history":[]},
-//     {"index":4,"name":"silver", "history":[]},
-//     {"index":5,"name":"gold", "history":[]}
-// ]
-// Trends.create(arr, function(err, docs) {
-//     if (err) {
-//         console.log("shit's fucked yo");
-//     }
-// });
-// 
+// test
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("port", (process.env.PORT || 5000));
