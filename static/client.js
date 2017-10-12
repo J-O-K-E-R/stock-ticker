@@ -52,7 +52,8 @@ $(document).ready(function() {
             let dir = "<div>" + data.resultHist[i].direction + "</div>"
             let delta = "<div>" + data.resultHist[i].delta + "</div>"
             $("#roll-history").append($('<li id="hist-'+i+'"></li>').append(stock,dir,delta));
-        })
+        });
+        socket.emit("update player", userid);
     });
 
     // Could use only one event for div/split/crash, but will keep seperate in case we need to pass specific data with them
