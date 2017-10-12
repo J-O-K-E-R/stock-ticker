@@ -3,7 +3,6 @@ const socketIO = require("socket.io");
 const User = require("./models/user");
 const Stocks = require("./models/stock");
 const Trends = require("./models/trend");
-
 const player = require("./player.js");
 
 const stockNames = [
@@ -60,7 +59,7 @@ exports.Game = class Game {
 
     roll() {
         if(Object.keys(this.rollResult).length !== 0) {
-            if(this.rollHistory.length >= 5) {
+            if(this.rollHistory.length >= 25) {
                 this.rollHistory.pop();
             }
             this.rollHistory.unshift(cloneResult(this.rollResult));

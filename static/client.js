@@ -1,5 +1,4 @@
 const socket = io();
-
 const stocks = [
     "Grain",
     "Industrial",

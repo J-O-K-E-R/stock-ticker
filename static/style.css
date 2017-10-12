@@ -61,6 +61,8 @@ a:hover {
 .history-boxes {
     margin: 25px auto;
     text-align: center;
+    max-height: 300px;
+    overflow-y: scroll;
 }
 
 .roll-container div {
