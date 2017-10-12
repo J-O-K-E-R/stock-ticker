@@ -8,6 +8,7 @@ const LocalStrategy = require("passport-local");
 const bodyParser = require("body-parser");
 
 const User = require("./models/user");
+const Trend = require("./models/trend");
 
 const routes = require("./routes/index");
 
@@ -82,6 +83,20 @@ const game = new gameClass.Game(io);
 io.on("connection", function(socket) {
     socket.emit("load", game.stockValues);
     socket.emit("roll", {result: game.rollResult, resultHist: game.rollHistory});
+
+    let findTrends = new Promise(
+        (resolve, reject) => {
+            Trend.find(function(err, trends) {
+                if (err) {
+                    // handle error
+                }
+                resolve(trends);
+            });
+        }
+    );  
+    findTrends.then( (trends) => {
+        socket.emit("update trends", trends);
+    });
 
     socket.on("push user", function(userId) {
         game.pushPlayer(userId);
