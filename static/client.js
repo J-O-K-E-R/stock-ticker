@@ -14,11 +14,11 @@ $(document).ready(function() {
     $.each(stocks, function(i) {
         $("#buy-" + stocks[i].toLowerCase()).on("click", function() {
             socket.emit("buy stock", {i: i, userid: userid});
-            console.log("buying stock " + i);
+            //console.log("buying stock " + i);
         });
         $("#sell-" + stocks[i].toLowerCase()).on("click", function() {
             socket.emit("sell stock", {i: i, userid: userid});
-            console.log("selling stock " + i);
+            //console.log("selling stock " + i);
         });
     });
 
@@ -71,12 +71,12 @@ $(document).ready(function() {
     // UPDATE ALL THE TREND DISPLAYS WHEN THIS MESSAGE IS RECEIVED
     // THIS IS ONLY SENT WHEN THE PAGE IS (RE)LOADED
     socket.on("update trends", function(trends) {
-        console.log(trends);
+        //console.log(trend.history[0].newValue);
     });
 
     // UPDATE ONLY THE LAST TREND THAT WAS ROLLED
     // SENT AFTER EVERY ROLL
     socket.on("update one trend", function(trend) {
-        console.log(trend);
+        console.log(trend.history[0].newValue + ", " + trend.history[0].stock);
     });
 });
